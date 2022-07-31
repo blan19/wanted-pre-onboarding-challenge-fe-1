@@ -1,11 +1,8 @@
 import React from "react";
+import AuthForm from "../../components/auth/authForm";
 
 const Login = () => {
-  return (
-    <div>
-      <h1>Login Rout</h1>
-    </div>
-  );
+  return <AuthForm />;
 };
 
 export default Login;
