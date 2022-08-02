@@ -1,32 +1,31 @@
-import React from "react";
 import { API_URL } from "../constants/api";
-import type { User } from "../types/user";
+import type { ResponseUser, User } from "../types/user";
 
-const login = async (
-  user: User,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  setLoading(true);
+const auth = async (user: User, type: "login" | "create") => {
+  if (!user.email || !user.password)
+    throw Error("이메일 또는 패스워드가 비어있습니다");
+
   console.log(user);
 
-  const res = await fetch(`${API_URL}/users/create`, {
+  const res = await fetch(`${API_URL}/users/${type}`, {
     method: "POST",
     headers: {
-      "Content-Type": "applcation/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(user),
-  }).then((res) => {
-    setLoading(false);
-    return res;
   });
 
-  if (!res.ok) throw Error("failure login api");
+  if (!res.ok) throw Error("예상치 못한 에러가 발생했습니다");
 
-  return res.json();
+  const data: ResponseUser = await res.json();
+
+  localStorage.setItem("auth", JSON.stringify(data.token));
+
+  return data;
 };
 
-const signup = async () => {};
+const logout = () => {
+  localStorage.removeItem("auth");
+};
 
-const logout = () => {};
-
-export { login, signup, logout };
+export { auth, logout };
