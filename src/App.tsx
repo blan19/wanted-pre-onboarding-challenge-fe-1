@@ -1,15 +1,17 @@
 import React, { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Todos from "./pages/Todos";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Login = lazy(() => import("./pages/Auth/login"));
 const SignUp = lazy(() => import("./pages/Auth/signUp"));
+const TodosDetail = lazy(() => import("./pages/Todos/TodoDetail"));
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/*" element={<Home />} />
       <Route path="/auth" element={<Auth />}>
         <Route path="login" element={<Login />} />
         <Route path="signUp" element={<SignUp />} />

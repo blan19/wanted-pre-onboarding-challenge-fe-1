@@ -1,19 +1,50 @@
-import React, { useCallback, useState } from "react";
-import { login } from "../../utils/user";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import useUser from "../../hooks/useUser";
+import { auth } from "../../utils/user";
 import Button from "../button";
+
+type Props = {
+  type: "login" | "create";
+} & {
+  children?: React.ReactNode;
+};
 
 type FormData = {
   email: string;
   password: string;
 };
 
-const AuthForm = () => {
+const AuthForm = ({ type }: Props) => {
   const [value, setValue] = useState<FormData>({
     email: "",
     password: "",
   });
+  const [error, setError] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
+  const { isLogin } = useUser();
+  const navigator = useNavigate();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const RequireEmailAndPassword = (email: string, password: string) => {
+    if (
+      email.match("^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$") &&
+      password.length >= 8
+    )
+      return false;
+
+    return true;
+  };
+
+  const memorizedFn = useMemo(
+    () => RequireEmailAndPassword(value.email, value.password),
+    [value]
+  );
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValue((prev) => ({
@@ -23,7 +54,7 @@ const AuthForm = () => {
   }, []);
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
+    (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       const { email, password } = value;
@@ -33,14 +64,20 @@ const AuthForm = () => {
         password,
       };
 
-      const res = await login(data, setLoading).then((res) => res);
+      auth(data, type)
+        .then(() => navigator("/"))
+        .catch((error: Error) => setError(error.message));
     },
     [value]
   );
 
+  useEffect(() => {
+    if (isLogin) navigator("/");
+  }, [isLogin]);
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>로그인/회원가입</h1>
+    <form onSubmit={(e) => startTransition(() => handleSubmit(e))}>
+      <h1>{type === "login" ? "로그인" : "회원가입"}</h1>
       <div>
         <label htmlFor="email">이메일</label>
         <input
@@ -66,7 +103,11 @@ const AuthForm = () => {
           onChange={handleChange}
         />
       </div>
-      <Button type="submit">로그인/회원가입</Button>
+      {error && <span>{error}</span>}
+      <Button type="submit" disabled={memorizedFn}>
+        {type === "login" ? "로그인" : "회원가입"}
+      </Button>
+      {isPending ? "진행중.." : null}
     </form>
   );
 };

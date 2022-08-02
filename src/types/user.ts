@@ -3,4 +3,9 @@ type User = {
   password: string;
 };
 
-export type { User };
+type ResponseUser = {
+  message: string;
+  token: string;
+};
+
+export type { User, ResponseUser };
