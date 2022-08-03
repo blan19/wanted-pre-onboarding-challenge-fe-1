@@ -5,8 +5,6 @@ const auth = async (user: User, type: "login" | "create") => {
   if (!user.email || !user.password)
     throw Error("이메일 또는 패스워드가 비어있습니다");
 
-  console.log(user);
-
   const res = await fetch(`${API_URL}/users/${type}`, {
     method: "POST",
     headers: {

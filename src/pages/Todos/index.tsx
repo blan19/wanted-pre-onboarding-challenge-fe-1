@@ -1,9 +1,11 @@
 import React, { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+import useQuery from "../../hooks/useQuery";
 
 const TodoDetail = lazy(() => import("./TodoDetail"));
 
 const Todos = () => {
+  const {} = useQuery("");
   return (
     <div>
       <h1>Todos..</h1>
