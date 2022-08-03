@@ -1,22 +1,18 @@
-import React, { useEffect } from "react";
-import { Outlet, Route, Routes } from "react-router-dom";
-import useUser from "../../hooks/useUser";
-import Todos from "../Todos";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "../../components/button";
 
 const Home = () => {
-  const { isLogin } = useUser();
-
-  useEffect(() => {
-    console.log(isLogin);
-  }, [isLogin]);
-
+  const navigate = useNavigate();
   return (
-    <div>
-      <h1>Home Root Route</h1>
-      <Routes>
-        <Route path="todos/*" element={<Todos />} />
-      </Routes>
-    </div>
+    <main className="h-full flex flex-col items-center justify-evenly">
+      <h1 className="font-bold text-6xl whitespace-pre-line text-center leading-relaxed">
+        {`Welcome
+        `}
+        {`To-do`}
+      </h1>
+      <Button event={() => navigate("/todos")}>Start</Button>
+    </main>
   );
 };
 
