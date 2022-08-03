@@ -5,14 +5,16 @@ export default function useUser() {
 
   const getUserStatusInLocalSotorage = useCallback(() => {
     const status = localStorage.getItem("auth");
-    if (status) return JSON.parse(status);
+    if (status) return true;
     return false;
   }, []);
+
+  const mutation = useCallback(() => setIsLogin((prev) => !prev), []);
 
   useEffect(() => {
     if (getUserStatusInLocalSotorage()) setIsLogin(true);
     else setIsLogin(false);
-  }, []);
+  }, [isLogin]);
 
-  return { isLogin };
+  return { isLogin, mutation };
 }

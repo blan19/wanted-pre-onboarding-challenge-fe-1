@@ -17,7 +17,7 @@ const auth = async (user: User, type: "login" | "create") => {
 
   const data: ResponseUser = await res.json();
 
-  localStorage.setItem("auth", JSON.stringify(data.token));
+  localStorage.setItem("auth", data.token);
 
   return data;
 };

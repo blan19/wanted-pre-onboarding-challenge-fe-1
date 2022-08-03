@@ -1,4 +1,5 @@
-import { useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
+import instance from "../utils/api";
 
 interface State<T> {
   data?: T;
@@ -36,18 +37,20 @@ function useQuery<T = unknown>(
 
   const [state, dispatch] = useReducer(fetchReducer, initialState);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!url) return;
 
     dispatch({ type: "loading" });
 
     try {
-      const res = await fetch(url, options);
-      if (!res.ok) {
+      const res = await instance({
+        url,
+      });
+      if (res.status !== 200) {
         throw new Error(res.statusText);
       }
 
-      const data = (await res.json()) as T;
+      const data = (await res.data) as T;
       if (cancelRequest.current) return;
 
       dispatch({ type: "fetched", payload: data });
@@ -56,7 +59,7 @@ function useQuery<T = unknown>(
 
       dispatch({ type: "error", payload: error as Error });
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!url) return;

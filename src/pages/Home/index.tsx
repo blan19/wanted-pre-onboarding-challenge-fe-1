@@ -1,7 +1,6 @@
 import React from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/button";
-import Todos from "../Todos";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -12,10 +11,7 @@ const Home = () => {
         `}
         {`To-do`}
       </h1>
-      <Button event={() => navigate("/todos")}>Enroll</Button>
-      <Routes>
-        <Route path="todos/*" element={<Todos />} />
-      </Routes>
+      <Button event={() => navigate("/todos")}>Start</Button>
     </main>
   );
 };
