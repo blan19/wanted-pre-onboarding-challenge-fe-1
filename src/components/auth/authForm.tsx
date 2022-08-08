@@ -5,7 +5,7 @@ import React, {
   useState,
   useTransition,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useUser from "../../hooks/useUser";
 import { auth } from "../../utils/user";
 import Button from "../button";
@@ -76,11 +76,19 @@ const AuthForm = ({ type }: Props) => {
   }, [isLogin]);
 
   return (
-    <form onSubmit={(e) => startTransition(() => handleSubmit(e))}>
-      <h1>{type === "login" ? "로그인" : "회원가입"}</h1>
+    <form
+      className="space-y-5 flex flex-col"
+      onSubmit={(e) => startTransition(() => handleSubmit(e))}
+    >
+      <h1 className="font-bold text-4xl text-center">
+        {type === "login" ? "로그인" : "회원가입"}
+      </h1>
       <div>
-        <label htmlFor="email">이메일</label>
+        <label className="text-lg mr-4" htmlFor="email">
+          이메일
+        </label>
         <input
+          className="focus:outline-none focus:border-black focus:ring-1 focus:ring-black  border border-black rounded-lg w-full py-3 px-2 text-lg"
           type="email"
           id="email"
           name="email"
@@ -91,8 +99,11 @@ const AuthForm = ({ type }: Props) => {
         />
       </div>
       <div>
-        <label htmlFor="password">비밀번호</label>
+        <label className="text-lg mr-4" htmlFor="password">
+          비밀번호
+        </label>
         <input
+          className="focus:outline-none focus:border-black focus:ring-1 focus:ring-black  border border-black rounded-lg w-full py-3 px-2 text-lg"
           type="password"
           id="password"
           name="password"
@@ -103,11 +114,25 @@ const AuthForm = ({ type }: Props) => {
           onChange={handleChange}
         />
       </div>
-      {error && <span>{error}</span>}
+      {error && <span className="font-bold text-red-600">{error}</span>}
       <Button type="submit" disabled={memorizedFn}>
         {type === "login" ? "로그인" : "회원가입"}
       </Button>
       {isPending ? "진행중.." : null}
+      <div className="flex justify-end items-center text-sm">
+        <span className="pr-3">
+          {type === "login" ? "계정이 없으세요?" : "이미 계정이 존재하세요?"}
+        </span>
+        {type === "login" ? (
+          <Link className="font-bold" to="/auth/signUp">
+            회원가입
+          </Link>
+        ) : (
+          <Link className="font-bold" to="/auth/login">
+            로그인
+          </Link>
+        )}
+      </div>
     </form>
   );
 };

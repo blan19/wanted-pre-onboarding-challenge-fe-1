@@ -1,37 +1,63 @@
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useState,
-  useTransition,
-} from "react";
-import { useOutletContext } from "react-router-dom";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import Loading from "../../components/loading";
-import { ResponseTodo } from "../../types/todos";
-import { getTodoById } from "../../utils/todos";
-
-type OutletContext = {
-  id: string;
-};
+import { deleateTodo, getTodoById } from "../../utils/todos";
+import type { ResponseTodoById } from "../../types/todos";
 
 const TodoDetail = () => {
-  const [todo, setTodo] = useState<ResponseTodo>();
+  const [todo, setTodo] = useState<ResponseTodoById>();
   const [error, setError] = useState<string>("");
-  const [isPending, startTransition] = useTransition();
-  const { id } = useOutletContext<OutletContext>();
+  const { id, fetchData } = useOutletContext<{
+    id: string;
+    fetchData: () => Promise<void>;
+  }>();
+  const navigate = useNavigate();
 
-  const handleData = useCallback(
-    () =>
+  const handleData = useCallback(() => {
+    if (id)
       getTodoById(id)
         .then((res) => setTodo(res))
-        .catch((error: Error) => setError(error.message)),
-    []
+        .catch((error: Error) => setError(error.message));
+  }, [id]);
+
+  const handleUpdate = useCallback(
+    () => navigate(`/todos/create?type=edit`, { state: todo }),
+    [todo]
   );
+
+  const handleDelete = useCallback(() => {
+    if (id)
+      deleateTodo(id)
+        .then(() => {
+          fetchData();
+          navigate("/todos");
+        })
+        .catch((error: Error) => setError(error.message));
+  }, [id]);
+
+  useEffect(() => {
+    handleData();
+  }, [id]);
+
+  if (error) navigate("/todos", { replace: true });
 
   return (
     <Suspense fallback={<Loading />}>
-      <section>
-        <h1>{id}</h1>
+      <section className="flex flex-col h-full items-center justify-start my-10 mx-3 bg-gray-100 rounded-md">
+        <div className="relative w-full flex justify-center">
+          <label>제목 : </label>
+          <span>{todo?.data.title}</span>
+          <div className="absolute right-2">
+            <span className="cursor-pointer" onClick={handleUpdate}>
+              수정
+            </span>
+            {` / `}
+            <span className="cursor-pointer" onClick={handleDelete}>
+              삭제
+            </span>
+          </div>
+        </div>
+        <p className="mt-5">{todo?.data.content}</p>
       </section>
     </Suspense>
   );
