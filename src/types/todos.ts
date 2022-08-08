@@ -13,4 +13,8 @@ type ResponseTodo = {
   data: ResponseTodoData[];
 };
 
-export type { Todo, ResponseTodo, ResponseTodoData };
+type ResponseTodoById = {
+  data: ResponseTodoData;
+};
+
+export type { Todo, ResponseTodo, ResponseTodoData, ResponseTodoById };
