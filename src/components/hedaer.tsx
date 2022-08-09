@@ -1,22 +1,21 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import Button from "./button";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../utils/user";
+import useUser from "../hooks/useUser";
 
-type Props = {
-  isLogin: boolean;
-  mutation: () => void;
-} & {
+type Props = {} & {
   children?: React.ReactNode;
 };
 
-const Header = React.memo(function Header({ isLogin, mutation }: Props) {
+const Header = React.memo(function Header({}: Props) {
+  const { isLogin, mutation } = useUser();
   const navigate = useNavigate();
 
   const handleLogout = useCallback(() => {
     logout();
     mutation();
-  }, []);
+  }, [mutation]);
 
   const handleLogin = useCallback(() => navigate("/auth/login"), []);
 
