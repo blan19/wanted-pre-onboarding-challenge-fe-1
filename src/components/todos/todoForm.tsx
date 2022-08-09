@@ -45,7 +45,7 @@ const TodoForm = () => {
   );
 
   useLayoutEffect(() => {
-    if (isLogin) navigate("/auth/login", { replace: true });
+    if (!isLogin) navigate("/auth/login");
     if (CheckIsEdit && !state) navigate("/todos", { replace: true });
   }, []);
 

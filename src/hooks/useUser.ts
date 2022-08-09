@@ -1,19 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 
 export default function useUser() {
-  const [isLogin, setIsLogin] = useState<boolean>(false);
-
-  const getUserStatusInLocalSotorage = useCallback(() => {
-    const status = localStorage.getItem("auth");
-    if (status) return true;
+  const getUserStatusInLocalSotorage = () => {
+    if (localStorage.getItem("auth")) return true;
     return false;
-  }, []);
+  };
 
-  const mutation = useCallback(() => setIsLogin((prev) => !prev), []);
+  const [isLogin, setIsLogin] = useState<boolean>(getUserStatusInLocalSotorage);
+
+  const mutation = useCallback(
+    () => setIsLogin(getUserStatusInLocalSotorage),
+    []
+  );
 
   useEffect(() => {
-    if (getUserStatusInLocalSotorage()) setIsLogin(true);
-    else setIsLogin(false);
+    setIsLogin(() => getUserStatusInLocalSotorage());
   }, [isLogin]);
 
   return { isLogin, mutation };

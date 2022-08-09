@@ -1,4 +1,4 @@
-import React, { lazy, useMemo } from "react";
+import React, { lazy, useEffect, useMemo } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import TodosCard from "../../components/todos/todosCard";
 import { API_URL } from "../../constants/api";
@@ -9,7 +9,6 @@ import type { ResponseTodo } from "../../types/todos";
 const Header = lazy(() => import("../../components/hedaer"));
 
 const Todos = () => {
-  const { isLogin, mutation } = useUser();
   const { data: todosData, fetchData } = useQuery<ResponseTodo>(
     `${API_URL}/todos`
   );
@@ -23,7 +22,7 @@ const Todos = () => {
 
   return (
     <>
-      <Header isLogin={isLogin} mutation={mutation} />
+      <Header />
       <main className="h-full">
         <nav className="flex space-x-3 overflow-x-auto mx-3">
           {memorizeData}
