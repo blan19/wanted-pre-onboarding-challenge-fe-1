@@ -1,7 +1,7 @@
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Loading from "../../components/loading";
-import { deleateTodo, getTodoById } from "../../utils/todos";
+import * as todoApi from "../../utils/todos";
 import type { ResponseTodoById } from "../../types/todos";
 
 const TodoDetail = () => {
@@ -15,7 +15,8 @@ const TodoDetail = () => {
 
   const handleData = useCallback(() => {
     if (id)
-      getTodoById(id)
+      todoApi
+        .getTodoById(id)
         .then((res) => setTodo(res))
         .catch((error: Error) => setError(error.message));
   }, [id]);
@@ -27,7 +28,8 @@ const TodoDetail = () => {
 
   const handleDelete = useCallback(() => {
     if (id)
-      deleateTodo(id)
+      todoApi
+        .deleateTodo(id)
         .then(() => {
           fetchData();
           navigate("/todos");

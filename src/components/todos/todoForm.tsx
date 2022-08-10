@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import useUser from "../../hooks/useUser";
 import Button from "../button";
 import { useLocation, useNavigate } from "react-router-dom";
-import { createTodo, updateTodo } from "../../utils/todos";
+import * as todoApi from "../../utils/todos";
 import useQueryString from "../../hooks/useQueryString";
 import type { Todo } from "../../types/todos";
 
@@ -28,11 +28,13 @@ const TodoForm = () => {
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (CheckIsEdit)
-        updateTodo(value, state.data.id)
+        todoApi
+          .updateTodo(value, state.data.id)
           .then(() => navigate("/todos", { replace: true }))
           .catch((error) => console.log(error));
       else
-        createTodo(value)
+        todoApi
+          .createTodo(value)
           .then(() => navigate("/todos", { replace: true }))
           .catch((error) => console.log(error));
     },

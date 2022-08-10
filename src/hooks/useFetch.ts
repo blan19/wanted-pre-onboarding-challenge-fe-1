@@ -11,7 +11,7 @@ type Action<T> =
   | { type: "fetched"; payload: T }
   | { type: "error"; payload: Error };
 
-function useQuery<T = unknown>(
+function useFetch<T = unknown>(
   url?: string,
   options?: RequestInit
 ): State<T> & { fetchData: () => Promise<void> } {
@@ -80,4 +80,4 @@ function useQuery<T = unknown>(
   };
 }
 
-export default useQuery;
+export default useFetch;

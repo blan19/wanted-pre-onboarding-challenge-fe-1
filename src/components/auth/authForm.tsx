@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useUser from "../../hooks/useUser";
-import { auth } from "../../utils/user";
+import * as userApi from "../../utils/user";
 import Button from "../button";
 
 type Props = {
@@ -57,16 +57,16 @@ const AuthForm = ({ type }: Props) => {
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      const { email, password } = value;
-
-      const data = {
-        email,
-        password,
-      };
-
-      auth(data, type)
-        .then(() => navigator("/"))
-        .catch((error: Error) => setError(error.message));
+      if (type === "create")
+        userApi
+          .register({ email: value.email, password: value.password })
+          .then(() => navigator("/"))
+          .catch((error: Error) => setError(error.message));
+      else
+        userApi
+          .login({ email: value.email, password: value.password })
+          .then(() => navigator("/"))
+          .catch((error: Error) => setError(error.message));
     },
     [value]
   );
