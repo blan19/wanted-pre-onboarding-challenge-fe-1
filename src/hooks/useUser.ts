@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function useUser() {
+type UseUserProps = {
+  redirectTo?: string;
+};
+
+export default function useUser(options?: UseUserProps) {
+  const navigate = useNavigate();
   const getUserStatusInLocalSotorage = () => {
     if (localStorage.getItem("auth")) return true;
     return false;
@@ -16,6 +22,11 @@ export default function useUser() {
   useEffect(() => {
     setIsLogin(() => getUserStatusInLocalSotorage());
   }, [isLogin]);
+
+  useEffect(() => {
+    if (options?.redirectTo && isLogin)
+      navigate(options.redirectTo, { replace: true });
+  }, [options?.redirectTo, isLogin]);
 
   return { isLogin, mutation };
 }

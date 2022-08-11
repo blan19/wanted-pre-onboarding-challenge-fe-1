@@ -1,74 +1,26 @@
 import React, { useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import useForm from "../../hooks/useForm";
-import useInput from "../../hooks/useInput";
+import { Link } from "react-router-dom";
 import useUser from "../../hooks/useUser";
 import Button from "../button";
-import * as userApi from "../../utils/user";
+import isValidatedEmailAndPassword from "../../utils/validate";
+import { AuthFormProps } from "../../types/auth";
 
-type Props = {
-  type: "login" | "create";
-} & {
-  children?: React.ReactNode;
-};
-
-type FormData = {
-  email: string;
-  password: string;
-};
-
-const AuthForm = ({ type }: Props) => {
-  const { values, handleValues } = useInput<FormData>({
-    initialState: {
-      email: "",
-      password: "",
-    },
-  });
-  const {
-    error: registerError,
-    handleSubmit: handleRegister,
-    success: registerSuccess,
-  } = useForm<FormData>({ callback: userApi.register, values });
-  const {
-    error: loginError,
-    handleSubmit: handleLogin,
-    success: loginSuccess,
-  } = useForm<FormData>({
-    callback: userApi.login,
-    values,
-  });
-  const { isLogin, mutation } = useUser();
-  const navigator = useNavigate();
-
-  const RequireEmailAndPassword = (email: string, password: string) => {
-    if (
-      email.match("^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$") &&
-      password.length >= 8
-    )
-      return false;
-
-    return true;
-  };
+const AuthForm = (props: AuthFormProps) => {
+  const { values, type, error, success, handleSubmit, handleValues } = props;
+  const { mutation } = useUser({ redirectTo: "/todos" });
 
   const memorizedFn = useMemo(
-    () => RequireEmailAndPassword(values.email, values.password),
+    () => isValidatedEmailAndPassword(values.email, values.password),
     [values]
   );
 
   useEffect(() => {
-    if (loginSuccess) mutation();
-    if (registerSuccess) mutation();
-  }, [loginSuccess, registerSuccess, mutation]);
-
-  useEffect(() => {
-    if (isLogin) navigator("/");
-  }, [isLogin]);
+    if (success) mutation();
+    if (success) mutation();
+  }, [success, mutation]);
 
   return (
-    <form
-      className="space-y-5 flex flex-col"
-      onSubmit={type === "create" ? handleRegister : handleLogin}
-    >
+    <form className="space-y-5 flex flex-col" onSubmit={handleSubmit}>
       <h1 className="font-bold text-4xl text-center">
         {type === "login" ? "로그인" : "회원가입"}
       </h1>
@@ -103,12 +55,7 @@ const AuthForm = ({ type }: Props) => {
           onChange={handleValues}
         />
       </div>
-      {loginError && (
-        <span className="font-bold text-red-600">{loginError}</span>
-      )}
-      {registerError && (
-        <span className="font-bold text-red-600">{registerError}</span>
-      )}
+      {error && <span className="font-bold text-red-600">{error}</span>}
       <Button type="submit" disabled={memorizedFn}>
         {type === "login" ? "로그인" : "회원가입"}
       </Button>
