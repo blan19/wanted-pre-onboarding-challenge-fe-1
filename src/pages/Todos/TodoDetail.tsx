@@ -3,23 +3,18 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import Loading from "../../components/loading";
 import * as todoApi from "../../utils/todos";
 import type { ResponseTodoById } from "../../types/todos";
+import useFetch from "../../hooks/useFetch";
 
 const TodoDetail = () => {
-  const [todo, setTodo] = useState<ResponseTodoById>();
   const [error, setError] = useState<string>("");
   const { id, fetchData } = useOutletContext<{
     id: string;
     fetchData: () => Promise<void>;
   }>();
+  const { data: todo, error: todoGetError } = useFetch<ResponseTodoById>(
+    `/todos/${id}`
+  );
   const navigate = useNavigate();
-
-  const handleData = useCallback(() => {
-    if (id)
-      todoApi
-        .getTodoById(id)
-        .then((res) => setTodo(res))
-        .catch((error: Error) => setError(error.message));
-  }, [id]);
 
   const handleUpdate = useCallback(
     () => navigate(`/todos/create?type=edit`, { state: todo }),
@@ -38,10 +33,8 @@ const TodoDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    handleData();
-  }, [id]);
-
-  if (error) navigate("/todos", { replace: true });
+    if (todoGetError) navigate("/todos", { replace: true });
+  }, [todoGetError]);
 
   return (
     <Suspense fallback={<Loading />}>
@@ -60,6 +53,9 @@ const TodoDetail = () => {
           </div>
         </div>
         <p className="mt-5">{todo?.data.content}</p>
+        {todoGetError && (
+          <span className="font-bold text-red-600">{todoGetError.message}</span>
+        )}
       </section>
     </Suspense>
   );

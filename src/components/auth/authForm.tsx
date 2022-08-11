@@ -1,14 +1,10 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
+import React, { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import useForm from "../../hooks/useForm";
+import useInput from "../../hooks/useInput";
 import useUser from "../../hooks/useUser";
-import * as userApi from "../../utils/user";
 import Button from "../button";
+import * as userApi from "../../utils/user";
 
 type Props = {
   type: "login" | "create";
@@ -22,13 +18,26 @@ type FormData = {
 };
 
 const AuthForm = ({ type }: Props) => {
-  const [value, setValue] = useState<FormData>({
-    email: "",
-    password: "",
+  const { values, handleValues } = useInput<FormData>({
+    initialState: {
+      email: "",
+      password: "",
+    },
   });
-  const [error, setError] = useState<string>("");
-  const [isPending, startTransition] = useTransition();
-  const { isLogin } = useUser();
+  const {
+    error: registerError,
+    handleSubmit: handleRegister,
+    success: registerSuccess,
+  } = useForm<FormData>({ callback: userApi.register, values });
+  const {
+    error: loginError,
+    handleSubmit: handleLogin,
+    success: loginSuccess,
+  } = useForm<FormData>({
+    callback: userApi.login,
+    values,
+  });
+  const { isLogin, mutation } = useUser();
   const navigator = useNavigate();
 
   const RequireEmailAndPassword = (email: string, password: string) => {
@@ -42,34 +51,14 @@ const AuthForm = ({ type }: Props) => {
   };
 
   const memorizedFn = useMemo(
-    () => RequireEmailAndPassword(value.email, value.password),
-    [value]
+    () => RequireEmailAndPassword(values.email, values.password),
+    [values]
   );
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  }, []);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      if (type === "create")
-        userApi
-          .register({ email: value.email, password: value.password })
-          .then(() => navigator("/"))
-          .catch((error: Error) => setError(error.message));
-      else
-        userApi
-          .login({ email: value.email, password: value.password })
-          .then(() => navigator("/"))
-          .catch((error: Error) => setError(error.message));
-    },
-    [value]
-  );
+  useEffect(() => {
+    if (loginSuccess) mutation();
+    if (registerSuccess) mutation();
+  }, [loginSuccess, registerSuccess, mutation]);
 
   useEffect(() => {
     if (isLogin) navigator("/");
@@ -78,7 +67,7 @@ const AuthForm = ({ type }: Props) => {
   return (
     <form
       className="space-y-5 flex flex-col"
-      onSubmit={(e) => startTransition(() => handleSubmit(e))}
+      onSubmit={type === "create" ? handleRegister : handleLogin}
     >
       <h1 className="font-bold text-4xl text-center">
         {type === "login" ? "로그인" : "회원가입"}
@@ -94,8 +83,8 @@ const AuthForm = ({ type }: Props) => {
           name="email"
           required
           placeholder="이메일을 적어주세요"
-          value={value.email}
-          onChange={handleChange}
+          value={values.email}
+          onChange={handleValues}
         />
       </div>
       <div>
@@ -110,15 +99,19 @@ const AuthForm = ({ type }: Props) => {
           minLength={8}
           required
           placeholder="비밀번호를 적어주세요"
-          value={value.password}
-          onChange={handleChange}
+          value={values.password}
+          onChange={handleValues}
         />
       </div>
-      {error && <span className="font-bold text-red-600">{error}</span>}
+      {loginError && (
+        <span className="font-bold text-red-600">{loginError}</span>
+      )}
+      {registerError && (
+        <span className="font-bold text-red-600">{registerError}</span>
+      )}
       <Button type="submit" disabled={memorizedFn}>
         {type === "login" ? "로그인" : "회원가입"}
       </Button>
-      {isPending ? "진행중.." : null}
       <div className="flex justify-end items-center text-sm">
         <span className="pr-3">
           {type === "login" ? "계정이 없으세요?" : "이미 계정이 존재하세요?"}

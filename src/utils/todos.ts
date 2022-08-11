@@ -32,13 +32,13 @@ const getTodoById = async (id: string) => {
   return data;
 };
 
-const updateTodo = async (todo: Todo, id: string) => {
+const updateTodo = async ({ title, content, id }: Todo & { id: string }) => {
   if (!id) throw Error("empty id");
 
   const res = await instance({
     url: `/todos/${id}`,
     method: "PUT",
-    data: todo,
+    data: { title, content },
   });
 
   if (res.status !== 200) throw Error("예상치 못한 에러가 발생했습니다");
