@@ -2,6 +2,10 @@
 
 원티드 프론트엔드 프리온보딩 첼린지를 위한 사전과제입니다.
 
+## 사용 스택
+
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/vite-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-06B6D4.svg?style=for-the-badge&logo=tailwindCSS&logoColor=white) ![React Router](https://img.shields.io/badge/React_Router-CA4245.svg?style=for-the-badge&logo=reactRouter&logoColor=white)
+
 ## 온보딩 1회차
 
 `1. 함수 네이밍의 중요성을 다시 한 번 알게되었습니다.`
@@ -223,9 +227,3 @@ export default Login;
 - 로그인 / 회원 가입 기능은 유저를 DB에 추가하고 JWT 토큰을 응답으로 돌려줄 뿐, 실제 유저별로 Todo 목록을 관계 지어 관리하지는 않습니다. (모든 유저가 하나의 Todo를 가짐)
 
 - 로그아웃은 클라이언트 단에서 localStorage에 저장된 token을 삭제하는 방식으로 간단히 구현해주세요.
-
-## 사용 스택
-
-1. React
-2. React-Router
-3. Vite
