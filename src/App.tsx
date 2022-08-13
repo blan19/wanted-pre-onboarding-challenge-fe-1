@@ -13,19 +13,38 @@ const TodoDetail = lazy(() => import("./pages/Todos/todoDetail"));
 
 const App = () => {
   return (
-    <Suspense fallback={<Loading />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="auth" element={<Auth />}>
-          <Route path="login" element={<Login />} />
-          <Route path="signUp" element={<SignUp />} />
-        </Route>
-        <Route path="todos" element={<Todos />}>
-          <Route path=":id" element={<TodoDetail />} />
-        </Route>
-        <Route path="/todos/create" element={<TodoCreate />} />
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route
+        path="auth"
+        element={
+          <Suspense fallback={<Loading />}>
+            <Auth />
+          </Suspense>
+        }
+      >
+        <Route path="login" element={<Login />} />
+        <Route path="signUp" element={<SignUp />} />
+      </Route>
+      <Route
+        path="todos"
+        element={
+          <Suspense fallback={<Loading />}>
+            <Todos />
+          </Suspense>
+        }
+      >
+        <Route path=":id" element={<TodoDetail />} />
+      </Route>
+      <Route
+        path="/todos/create"
+        element={
+          <Suspense fallback={<Loading />}>
+            <TodoCreate />
+          </Suspense>
+        }
+      />
+    </Routes>
   );
 };
 
