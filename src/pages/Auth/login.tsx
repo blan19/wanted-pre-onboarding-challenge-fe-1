@@ -12,22 +12,19 @@ const Login = () => {
       password: "",
     },
   });
-  const {
-    error: loginError,
-    handleSubmit: handleLogin,
-    success: loginSuccess,
-  } = useForm<AuthFormValues>({
+
+  const { error, handleSubmit, success } = useForm<AuthFormValues>({
     callback: userApi.login,
     values,
   });
 
   const props: AuthFormProps = {
     type: "login",
-    error: loginError,
-    success: loginSuccess,
-    values: values,
-    handleSubmit: handleLogin,
-    handleValues: handleValues,
+    error,
+    success,
+    values,
+    handleSubmit,
+    handleValues,
   };
 
   return <AuthForm {...props} />;

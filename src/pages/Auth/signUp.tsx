@@ -12,19 +12,19 @@ const SignUp = () => {
       password: "",
     },
   });
-  const {
-    error: registerError,
-    handleSubmit: handleRegister,
-    success: registerSuccess,
-  } = useForm<AuthFormValues>({ callback: userApi.register, values });
+
+  const { error, handleSubmit, success } = useForm<AuthFormValues>({
+    callback: userApi.register,
+    values,
+  });
 
   const props: AuthFormProps = {
     type: "create",
-    error: registerError,
-    success: registerSuccess,
-    values: values,
-    handleSubmit: handleRegister,
-    handleValues: handleValues,
+    error,
+    success,
+    values,
+    handleSubmit,
+    handleValues,
   };
 
   return <AuthForm {...props} />;

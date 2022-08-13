@@ -8,4 +8,4 @@ const isValidatedEmailAndPassword = (email: string, password: string) => {
   return true;
 };
 
-export default isValidatedEmailAndPassword;
+export { isValidatedEmailAndPassword };

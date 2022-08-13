@@ -2,7 +2,190 @@
 
 원티드 프론트엔드 프리온보딩 첼린지를 위한 사전과제입니다.
 
-## 요구사항
+## 온보딩 1회차
+
+`1. 함수 네이밍의 중요성을 다시 한 번 알게되었습니다.`
+
+- Before
+
+```typescript
+auth(data, type)
+  .then(() => navigate("/"))
+  .catch((error: Error) => setError(error.message));
+```
+
+처음 auth 함수를 보면 이 함수가 무슨 동작을 할까가 한번에 와닿지 않습니다.
+auth라는 의미자체도 추상 레벨이 있고, 이 함수가 받는 인자도 의미가 명확하지 않았습니다.
+그래서 이 비동기 로직의 성공 케이스와 에러케이스의 흐름도 명확하지 않게 되었습니다
+
+1회차에 피드백 받은 함수 네이밍에 대해 다시 한 번 신경써서 네이밍 부분에서 리팩토링을 실천하였습니다.
+
+- After
+
+```typescript
+userApi.login(user: User)
+userApi.register(user: User)
+```
+
+auth라는 함수는 로그인과 회원가입 두가지 일을 하는 함수였습니다.
+이 부분에서 한 가지 일만하는 함수로 분리를 시도하였고, 함수 네이밍 부분에서 더욱 명확하도록 신경 썼습니다.
+
+auth 함수 뿐만 아니라 다른 함수들도 네이밍 부분에서 리팩토링을 시도하였습니다.
+
+`2. 독립적인 컴포넌트를 위해 제어는 페이지로`
+
+- Before
+
+![AuthForm](https://user-images.githubusercontent.com/66871265/184464290-b2814b81-6a25-4687-b63d-112d780d369e.png)
+
+AuthForm만 보더라도 어지러워보입니다.
+컴포넌트 자체의 코드 길이가 너무 길기도하고, 복잡해서 가독성이 떨어졌었습니다.
+이와 비슷한 로직을 가지고 있는 컴포넌트가 하나 더 있는데 TodoForm 입니다.
+이 컴포넌트는 컴포넌트 자체에서 데이터를 핸들링하고 있습니다.
+
+이 부분에서 리팩토링을 진행했는데, 재사용되는 코드들을 hooks로 나누고 데이터에 대한 핸들링 추상화해주어 페이지 단에서 props로 내려주었습니다.
+
+- After
+
+여러 곳에서 쓰이는 코드들을 hooks로 분리
+
+```typescript
+import { useCallback, useState } from "react";
+
+type UseInputProps<T> = {
+  initialState: T;
+};
+
+export default function useInput<T>({ initialState }: UseInputProps<T>) {
+  const [values, setValues] = useState<T>(initialState);
+
+  const handleValues = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setValues((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      })),
+    [values]
+  );
+
+  return { values, handleValues };
+}
+```
+
+```typescript
+import { useCallback, useEffect, useState } from "react";
+
+type UseFormProps<T> = {
+  callback: (args: T) => Promise<any>;
+  values: T;
+};
+
+export default function useForm<T>({ values, callback }: UseFormProps<T>) {
+  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      callback(values)
+        .then(() => setSuccess(true))
+        .catch((e: Error) => setError(e.message));
+    },
+    [values]
+  );
+
+  useEffect(() => {
+    return () => {
+      setSuccess(false);
+      setError("");
+    };
+  }, []);
+
+  return { success, error, handleSubmit };
+}
+```
+
+```typescript
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+type UseUserProps = {
+  redirectTo?: string;
+  requireLogin?: boolean;
+};
+
+export default function useUser(options?: UseUserProps) {
+  const navigate = useNavigate();
+  const getUserStatusInLocalSotorage = () => {
+    if (localStorage.getItem("auth")) return true;
+    return false;
+  };
+
+  const [isLogin, setIsLogin] = useState<boolean>(getUserStatusInLocalSotorage);
+
+  const mutation = useCallback(
+    () => setIsLogin(getUserStatusInLocalSotorage),
+    []
+  );
+
+  useEffect(() => {
+    setIsLogin(() => getUserStatusInLocalSotorage());
+  }, [isLogin]);
+
+  useEffect(() => {
+    if (options?.redirectTo && isLogin)
+      navigate(options.redirectTo, { replace: true });
+  }, [options?.redirectTo, isLogin]);
+
+  useLayoutEffect(() => {
+    if (options?.requireLogin) navigate("/auth/login", { replace: true });
+  }, []);
+
+  return { isLogin, mutation };
+}
+```
+
+페이지 단에서 핸들링
+
+```typescript
+import React from "react";
+import AuthForm from "../../components/auth/authForm";
+import useForm from "../../hooks/useForm";
+import useInput from "../../hooks/useInput";
+import { AuthFormProps, AuthFormValues } from "../../types/auth";
+import * as userApi from "../../utils/user";
+
+const Login = () => {
+  const { values, handleValues } = useInput<AuthFormValues>({
+    initialState: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { error, handleSubmit, success } = useForm<AuthFormValues>({
+    callback: userApi.login,
+    values,
+  });
+
+  const props: AuthFormProps = {
+    type: "login",
+    error,
+    success,
+    values,
+    handleSubmit,
+    handleValues,
+  };
+
+  return <AuthForm {...props} />;
+};
+
+export default Login;
+```
+
+이렇게 재사용되는 코드들을 hooks로 나눠주고 데이터에 대한 핸들링은 상위 컴포넌트에 넘겨줌으로써 AuthForm, TodoForm 컴포넌트는 복잡도가 낮아졌고, 가독성이 증가했습니다
+
+## 사전 과제 요구사항
 
 `1. Assignment 1 - Login / SignUp`
 

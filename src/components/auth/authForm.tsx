@@ -2,8 +2,9 @@ import React, { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import useUser from "../../hooks/useUser";
 import Button from "../button";
-import isValidatedEmailAndPassword from "../../utils/validate";
-import { AuthFormProps } from "../../types/auth";
+import { isValidatedEmailAndPassword } from "../../utils/validate";
+import { H1, Paragraph } from "../typography";
+import type { AuthFormProps } from "../../types/auth";
 
 const AuthForm = (props: AuthFormProps) => {
   const { values, type, error, success, handleSubmit, handleValues } = props;
@@ -16,14 +17,11 @@ const AuthForm = (props: AuthFormProps) => {
 
   useEffect(() => {
     if (success) mutation();
-    if (success) mutation();
   }, [success, mutation]);
 
   return (
     <form className="space-y-5 flex flex-col" onSubmit={handleSubmit}>
-      <h1 className="font-bold text-4xl text-center">
-        {type === "login" ? "로그인" : "회원가입"}
-      </h1>
+      <H1>{type === "login" ? "로그인" : "회원가입"}</H1>
       <div>
         <label className="text-lg mr-4" htmlFor="email">
           이메일
@@ -60,16 +58,16 @@ const AuthForm = (props: AuthFormProps) => {
         {type === "login" ? "로그인" : "회원가입"}
       </Button>
       <div className="flex justify-end items-center text-sm">
-        <span className="pr-3">
+        <Paragraph as="span" className="pr-2">
           {type === "login" ? "계정이 없으세요?" : "이미 계정이 존재하세요?"}
-        </span>
+        </Paragraph>
         {type === "login" ? (
-          <Link className="font-bold" to="/auth/signUp">
-            회원가입
+          <Link to="/auth/signUp">
+            <Paragraph as="b">회원가입</Paragraph>
           </Link>
         ) : (
-          <Link className="font-bold" to="/auth/login">
-            로그인
+          <Link to="/auth/login">
+            <Paragraph as="b">로그인</Paragraph>
           </Link>
         )}
       </div>

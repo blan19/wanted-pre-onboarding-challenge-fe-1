@@ -2,8 +2,8 @@ import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import Loading from "../../components/loading";
 import * as todoApi from "../../utils/todos";
-import type { ResponseTodoById } from "../../types/todos";
 import useFetch from "../../hooks/useFetch";
+import type { ResponseTodoById } from "../../types/todos";
 
 const TodoDetail = () => {
   const [error, setError] = useState<string>("");

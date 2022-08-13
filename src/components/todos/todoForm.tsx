@@ -7,6 +7,7 @@ import useInput from "../../hooks/useInput";
 import useForm from "../../hooks/useForm";
 import * as todoApi from "../../utils/todos";
 import type { Todo } from "../../types/todos";
+import { H1, Paragraph } from "../typography";
 
 const TodoForm = () => {
   const { isLogin } = useUser();
@@ -57,9 +58,7 @@ const TodoForm = () => {
       className="h-full flex flex-col justify-center items-center mx-20"
       onSubmit={isEdit ? handleUpdateTodo : handleCreateTodo}
     >
-      <h1 className="mb-10 font-bold text-4xl">
-        {isEdit ? "Update To-Do?" : "Adding To-Do?"}
-      </h1>
+      <H1>{isEdit ? "Update To-Do?" : "Adding To-Do?"}</H1>
       <div className="w-full space-y-5">
         <label className="font-bold text-xl">Title</label>
         <input
@@ -80,12 +79,8 @@ const TodoForm = () => {
           onChange={handleValues}
         />
       </div>
-      {createTodoError && (
-        <span className="font-bold text-red-600">{createTodoError}</span>
-      )}
-      {updateTodoError && (
-        <span className="font-bold text-red-600">{updateTodoError}</span>
-      )}
+      {createTodoError && <Paragraph as="span">{createTodoError}</Paragraph>}
+      {updateTodoError && <Paragraph as="span">{updateTodoError}</Paragraph>}
       <div className="mt-10 space-x-5">
         <Button type="submit">{isEdit ? "수정" : "추가"}</Button>
         <Button event={handleCancle} primary={false}>

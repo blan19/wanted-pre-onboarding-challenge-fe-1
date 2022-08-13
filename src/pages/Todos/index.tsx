@@ -1,11 +1,10 @@
-import React, { lazy, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import TodosCard from "../../components/todos/todosCard";
 import { API_URL } from "../../constants/api";
 import useFetch from "../../hooks/useFetch";
+import { Header } from "../../components/layouts";
 import type { ResponseTodo } from "../../types/todos";
-
-const Header = lazy(() => import("../../components/hedaer"));
 
 const Todos = () => {
   const { data: todosData, fetchData } = useFetch<ResponseTodo>(

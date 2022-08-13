@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 type UseUserProps = {
   redirectTo?: string;
+  requireLogin?: boolean;
 };
 
 export default function useUser(options?: UseUserProps) {
@@ -27,6 +28,10 @@ export default function useUser(options?: UseUserProps) {
     if (options?.redirectTo && isLogin)
       navigate(options.redirectTo, { replace: true });
   }, [options?.redirectTo, isLogin]);
+
+  useLayoutEffect(() => {
+    if (options?.requireLogin) navigate("/auth/login", { replace: true });
+  }, []);
 
   return { isLogin, mutation };
 }

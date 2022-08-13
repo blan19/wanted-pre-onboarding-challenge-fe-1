@@ -36,4 +36,4 @@ const Header = React.memo(function Header({}: Props) {
   );
 });
 
-export default Header;
+export { Header };
